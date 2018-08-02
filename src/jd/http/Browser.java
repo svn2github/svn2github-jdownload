@@ -696,6 +696,13 @@ public class Browser {
         return this.createPostRequest(url, UrlQuery.get(post), encoding);
     }
 
+    public PostRequest createJSonPostRequest(String url, String jsonPostString) throws IOException {
+        final PostRequest request = new PostRequest(this.getURL(url));
+        request.setPostDataString(jsonPostString);
+        request.setContentType("application/json; charset=UTF-8");
+        return request;
+    }
+
     public PostRequest createPostRequest(String url, UrlQuery post, final String encoding) throws IOException {
         final PostRequest request = new PostRequest(this.getURL(url));
         if (post != null) {
@@ -720,14 +727,26 @@ public class Browser {
      * Creates a new PostRequest based on a variable HashMap
      */
     public PostRequest createPostRequest(final String url, final UrlQuery post) throws IOException {
-        return this.createPostRequest(url, post.list(), null);
+        return this.createPostRequest(url, post, null);
+    }
+
+    public boolean probeJSonContent(final String post) {
+        return post != null && post.matches("(?s)^\\s*\\{.*?\\}\\s*$");
+    }
+
+    public boolean probeJSonContent(final byte post[]) {
+        return post != null && post.length >= 2 && post[0] == '{' && post[post.length - 1] == '{';
     }
 
     /**
      * Creates a PostRequest based on a querystring
      */
     public PostRequest createPostRequest(final String url, final String post) throws MalformedURLException, IOException {
-        return this.createPostRequest(url, Request.parseQuery(post));
+        if (this.probeJSonContent(post)) {
+            return this.createJSonPostRequest(url, post);
+        } else {
+            return this.createPostRequest(url, Request.parseQuery(post), null);
+        }
     }
 
     public String followRedirect() throws IOException {
@@ -1448,7 +1467,7 @@ public class Browser {
      */
     @Deprecated
     public URLConnectionAdapter openPostConnection(final String url, final LinkedHashMap<String, String> post) throws IOException {
-        return this.openRequestConnection(this.createPostRequest(url, UrlQuery.get(post)));
+        return this.openPostConnection(url, UrlQuery.get(post));
     }
 
     /**
@@ -1458,7 +1477,7 @@ public class Browser {
      */
     @Deprecated
     public URLConnectionAdapter openPostConnection(final String url, final String post) throws IOException {
-        return this.openPostConnection(url, Request.parseQuery(post));
+        return this.openRequestConnection(this.createPostRequest(url, post));
     }
 
     public URLConnectionAdapter openPostConnection(String url, UrlQuery query) throws IOException {
@@ -1746,7 +1765,8 @@ public class Browser {
      */
     @Deprecated
     public String postPage(final String url, final String post) throws IOException {
-        return this.postPage(url, Request.parseQuery(post));
+        final PostRequest postRequest = this.createPostRequest(url, post);
+        return this.getPage(postRequest);
     }
 
     public String postPage(String url, UrlQuery queryInfo) throws IOException {
@@ -1754,18 +1774,28 @@ public class Browser {
     }
 
     public String postPageRaw(final String url, final byte[] post) throws IOException {
-        final PostRequest request = this.createPostRequest(url, new ArrayList<KeyValueStringEntry>(), null);
-        request.setPostBytes(post);
-        return this.getPage(request);
+        final PostRequest postRequest;
+        if (this.probeJSonContent(post)) {
+            postRequest = this.createJSonPostRequest(url, new String(post, "UTF-8"));
+        } else {
+            postRequest = this.createPostRequest(url, new ArrayList<KeyValueStringEntry>(), null);
+            postRequest.setPostBytes(post);
+        }
+        return this.getPage(postRequest);
     }
 
     /**
      * loads a new page (post) the postdata is given by the poststring. It will be sent as is
      */
     public String postPageRaw(final String url, final String post) throws IOException {
-        final PostRequest request = this.createPostRequest(url, new ArrayList<KeyValueStringEntry>(), null);
-        request.setPostDataString(post);
-        return this.getPage(request);
+        final PostRequest postRequest;
+        if (this.probeJSonContent(post)) {
+            postRequest = this.createJSonPostRequest(url, post);
+        } else {
+            postRequest = this.createPostRequest(url, new UrlQuery(), null);
+            postRequest.setPostDataString(post);
+        }
+        return this.getPage(postRequest);
     }
 
     public List<HTTPProxy> selectProxies(final URL url) throws IOException {
