@@ -331,16 +331,25 @@ public class Encoding {
     }
 
     /**
-     * WARNING: we MUST use the encoding given in charset info by webserver! else missmatch will happen eg UTF8 vs ISO-8859-15
+     * WARNING: this method is ONLY for application/x-www-form-urlencoded !!!!
+     *
+     * Always safe: A-Z a-z 0-9 - . _ ~ ( ) ' ! * : @ , ;
+     *
+     * Sometimes Safe: Paths + & =
+     *
+     * Sometimes Safe: Queries: ? /
+     *
+     * Sometimes Safe: Fragments: ? / # + & =
+     *
+     * Never Safe: (RFC 3986) <space> <control-characters> <extended-ascii> <unicode> % < > [ ] { } | \ ^
      **/
     public static String urlEncode(final String str) {
-        if (str == null) {
-            return null;
-        }
-        try {
-            return URLEncoder.encode(str, "UTF-8");
-        } catch (final Exception e) {
-            org.appwork.utils.logging2.extmanager.LoggerFactory.getDefaultLogger().log(e);
+        if (str != null) {
+            try {
+                return URLEncoder.encode(str, "UTF-8");
+            } catch (final Exception e) {
+                org.appwork.utils.logging2.extmanager.LoggerFactory.getDefaultLogger().log(e);
+            }
         }
         return str;
     }
