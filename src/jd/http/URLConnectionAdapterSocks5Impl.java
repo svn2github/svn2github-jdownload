@@ -89,6 +89,11 @@ public class URLConnectionAdapterSocks5Impl extends Socks5HTTPConnectionImpl imp
         return super.getInputStream();
     }
 
+    @Override
+    public boolean isLegacyConnectEnabled() {
+        return false;
+    }
+
     /** {@inheritDoc} */
     @Override
     public String toString() {

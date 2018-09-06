@@ -38,6 +38,11 @@ public class URLConnectionAdapterNative extends NativeHTTPConnectionImpl impleme
     }
 
     @Override
+    public boolean isLegacyConnectEnabled() {
+        return false;
+    }
+
+    @Override
     public long getLongContentLength() {
         return this.getContentLength();
     }

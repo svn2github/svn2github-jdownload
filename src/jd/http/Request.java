@@ -781,6 +781,7 @@ public abstract class Request {
 
     private void openConnection() throws IOException {
         this.httpConnection = HTTPConnectionFactory.createHTTPConnection(URLHelper.getURL(this.getURL(), true, false, false), this.getProxy());
+        this.httpConnection.setLegacyConnectEnabled(false);
         this.httpConnection.setRequest(this);
         this.httpConnection.setIPVersion(this.getIPVersion());
         this.httpConnection.setReadTimeout(this.getReadTimeout());

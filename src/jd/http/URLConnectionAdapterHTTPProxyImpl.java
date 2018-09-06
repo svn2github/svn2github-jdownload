@@ -28,6 +28,11 @@ public class URLConnectionAdapterHTTPProxyImpl extends HTTPProxyHTTPConnectionIm
         super(url, proxy);
     }
 
+    @Override
+    public boolean isLegacyConnectEnabled() {
+        return false;
+    }
+
     /** {@inheritDoc} */
     @Override
     public InputStream getErrorStream() {

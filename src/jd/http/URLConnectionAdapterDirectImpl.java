@@ -53,6 +53,11 @@ public class URLConnectionAdapterDirectImpl extends HTTPConnectionImpl implement
     }
 
     @Override
+    public boolean isLegacyConnectEnabled() {
+        return false;
+    }
+
+    @Override
     public long[] getRange() {
         final long[] ret = super.getRange();
         if (ret == null && this.getResponseCode() == 206) {
