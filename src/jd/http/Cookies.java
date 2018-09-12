@@ -54,19 +54,24 @@ public class Cookies {
                 cookie.setHostTime(date);
                 final StringTokenizer st = new StringTokenizer(setCookie, ";");
                 while (st.hasMoreTokens()) {
-                    final String cookieelement = st.nextToken().trim();
+                    final String cookieKeyValueString = st.nextToken().trim();
                     /* Key and Value */
-                    final String st2[] = new Regex(cookieelement, "(.*?)=(.*)").getRow(0);
+                    final String keyValuePair[] = new Regex(cookieKeyValueString, "(.*?)=(.*)").getRow(0);
                     final String key;
                     final String value;
-                    if (st2 == null || st2.length == 0) {
-                        break;
-                    } else if (st2.length == 1) {
-                        key = st2[0].trim();
+                    if (keyValuePair == null || keyValuePair.length == 0) {
+                        if (StringUtils.isNotEmpty(cookieKeyValueString)) {
+                            key = cookieKeyValueString.trim();
+                            value = null;
+                        } else {
+                            continue;
+                        }
+                    } else if (keyValuePair.length == 1) {
+                        key = keyValuePair[0].trim();
                         value = null;
-                    } else if (st2.length == 2) {
-                        key = st2[0].trim();
-                        value = st2[1].trim();
+                    } else if (keyValuePair.length == 2) {
+                        key = keyValuePair[0].trim();
+                        value = keyValuePair[1].trim();
                     } else {
                         continue;
                     }
@@ -119,19 +124,24 @@ public class Cookies {
         /* Cookie individual elements */
         final StringTokenizer st = new StringTokenizer(header, ";");
         while (st.hasMoreTokens()) {
-            final String cookieelement = st.nextToken().trim();
+            final String cookieKeyValueString = st.nextToken().trim();
             /* Key and Value */
-            final String st2[] = new Regex(cookieelement, "(.*?)=(.*)").getRow(0);
+            final String keyValuePair[] = new Regex(cookieKeyValueString, "(.*?)=(.*)").getRow(0);
             final String key;
             final String value;
-            if (st2 == null || st2.length == 0) {
-                break;
-            } else if (st2.length == 1) {
-                key = st2[0].trim();
+            if (keyValuePair == null || keyValuePair.length == 0) {
+                if (StringUtils.isNotEmpty(cookieKeyValueString)) {
+                    key = cookieKeyValueString.trim();
+                    value = null;
+                } else {
+                    continue;
+                }
+            } else if (keyValuePair.length == 1) {
+                key = keyValuePair[0].trim();
                 value = null;
-            } else if (st2.length == 2) {
-                key = st2[0].trim();
-                value = st2[1].trim();
+            } else if (keyValuePair.length == 2) {
+                key = keyValuePair[0].trim();
+                value = keyValuePair[1].trim();
             } else {
                 continue;
             }
