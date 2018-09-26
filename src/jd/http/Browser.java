@@ -485,7 +485,7 @@ public class Browser {
     private boolean                  debug            = false;
     private boolean                  doRedirects      = false;
     private RequestHeader            headers;
-    private int                      limit            = 8 * 1024 * 1024;
+    private int                      limit            = -1;
     private LogInterface             logger           = null;
     private ProxySelectorInterface   proxy;
     private int                      readTimeout      = -1;
@@ -524,6 +524,10 @@ public class Browser {
                 throw new BrowserException("Content-length too big:" + length + ">" + limit, request);
             }
         }
+    }
+
+    public int getDefaultLoadLimit() {
+        return 8 * 1024 * 1024;
     }
 
     /**
@@ -1224,7 +1228,12 @@ public class Browser {
      * @param i
      */
     public int getLoadLimit() {
-        return this.limit;
+        final int ret = this.limit;
+        if (ret == -1) {
+            return this.getDefaultLoadLimit();
+        } else {
+            return ret;
+        }
     }
 
     public LogInterface getLogger() {
@@ -2014,7 +2023,7 @@ public class Browser {
      * @param i
      */
     public void setLoadLimit(final int i) {
-        this.limit = Math.max(0, i);
+        this.limit = Math.max(-1, i);
     }
 
     public void setLogger(final LogInterface logger) {
