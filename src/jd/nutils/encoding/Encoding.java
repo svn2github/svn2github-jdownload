@@ -222,7 +222,12 @@ public class Encoding {
     }
 
     public static String unicodeDecode(final String input) {
-        return input;
+        final Object ret = Encoding.unicodeDecode((CharSequence) input);
+        if (ret != null) {
+            return ret.toString();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -231,7 +236,7 @@ public class Encoding {
      * @param s
      * @return
      */
-    public static String unicodeDecode(final CharSequence input) {
+    public static CharSequence unicodeDecode(final CharSequence input) {
         if (input == null) {
             return null;
         }
@@ -309,7 +314,7 @@ public class Encoding {
             }
             sb.append(ch);
         }
-        return sb.toString();
+        return sb;
     }
 
     public static String urlDecode(String urlcoded, final boolean isUrl) {
