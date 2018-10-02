@@ -28,13 +28,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jd.nutils.encoding.Encoding;
+
 import org.appwork.utils.Application;
 import org.appwork.utils.StringUtils;
 import org.appwork.utils.encoding.Hex;
 import org.appwork.utils.logging2.LogInterface;
 import org.appwork.utils.net.URLHelper;
-
-import jd.nutils.encoding.Encoding;
 
 public class HTMLParser {
     private static class ConcatCharSequence implements CharSequence {
@@ -540,7 +540,7 @@ public class HTMLParser {
 
     final private static Httppattern[] linkAndFormPattern     = new Httppattern[] { new Httppattern(Pattern.compile("src.*?=.*?('|\\\\\"|\")(.*?)(\\1)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL), 2), new Httppattern(Pattern.compile("(<[ ]?a[^>]*?href=|<[ ]?form[^>]*?action=)('|\\\\\"|\")(.*?)(\\2)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL), 3), new Httppattern(Pattern.compile("(<[ ]?a[^>]*?href=|<[ ]?form[^>]*?action=)([^'\"][^\\s]*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL), 2), new Httppattern(Pattern.compile("\\[(link|url)\\](.*?)\\[/(link|url)\\]", Pattern.CASE_INSENSITIVE | Pattern.DOTALL), 2) };
     public final static String         protocolFile           = "file:/";
-    final private static String        protocolPrefixes       = "((?:chrome|directhttp://https?|usenet|flashget|https?viajd|https?|ccf|dlc|ftp|ftpviajd|jd|rsdf|jdlist|youtubev2" + (!Application.isJared(null) ? "|jdlog" : "") + ")://|" + HTMLParser.protocolFile + "|magnet:|mega:)";
+    final private static String        protocolPrefixes       = "((?:chrome|directhttp://https?|usenet|flashget|https?viajd|https?|ccf|dlc|ftp|ftpviajd|jd|rsdf|jdlist|youtubev2" + (!Application.isJared(null) ? "|jdlog" : "") + ")(?:://|\\\\x3A\\\\x2F\\\\x2F)|" + HTMLParser.protocolFile + "|magnet:|mega:)";
     final private static Pattern[]     basePattern            = new Pattern[] { Pattern.compile("base[^>]*?href=('|\")(.*?)\\1", Pattern.CASE_INSENSITIVE), Pattern.compile("base[^>]*?(href)=([^'\"][^\\s]*)", Pattern.CASE_INSENSITIVE) };
     final private static Pattern[]     hrefPattern            = new Pattern[] { Pattern.compile("data-\\w+=('|\")(.*?)(?:\\s*?)(\\1)", Pattern.CASE_INSENSITIVE), Pattern.compile("href=('|\")(.*?)(?:\\s*?)(\\1)", Pattern.CASE_INSENSITIVE), Pattern.compile("src=('|\")(.*?)(?:\\s*?)(\\1)", Pattern.CASE_INSENSITIVE) };
     final private static Pattern       pat1                   = Pattern.compile("(" + HTMLParser.protocolPrefixes + "|(?<!://)www\\.)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -1057,6 +1057,9 @@ public class HTMLParser {
     }
 
     private static HtmlParserCharSequence correctURL(HtmlParserResultSet results, HtmlParserCharSequence input) {
+        if (input.contains("\\x3A\\x2F\\x2F")) {
+            input = new HtmlParserCharSequence(Encoding.unicodeDecode(input));
+        }
         final int specialCutOff = input.indexOf("', ");
         if (specialCutOff >= 0) {
             final HtmlParserCharSequence cutoff = input.subSequence(0, specialCutOff);
@@ -1156,8 +1159,8 @@ public class HTMLParser {
     /**
      * Diese Methode sucht die vordefinierten input type="hidden" und formatiert sie zu einem poststring z.b. wÃ¼rde bei:
      *
-     * <input type="hidden" name="f" value="f50b0f" /> <input type="hidden" name="h" value="390b4be0182b85b0" />
-     * <input type="hidden" name="b" value="9" />
+     * <input type="hidden" name="f" value="f50b0f" /> <input type="hidden" name="h" value="390b4be0182b85b0" /> <input type="hidden"
+     * name="b" value="9" />
      *
      * f=f50b0f&h=390b4be0182b85b0&b=9 ausgegeben werden
      *
@@ -1208,7 +1211,7 @@ public class HTMLParser {
 
     /*
      * return tmplinks.toArray(new String[tmplinks.size()]); }
-     *
+     * 
      * /* parses data for available links and returns a string array which does not contain any duplicates
      */
     public static Collection<String> getHttpLinksIntern(String content, final String baseURLString, HtmlParserResultSet results) {

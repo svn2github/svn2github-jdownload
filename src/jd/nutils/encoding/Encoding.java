@@ -221,31 +221,41 @@ public class Encoding {
         }
     }
 
+    public static String unicodeDecode(final String input) {
+        return input;
+    }
+
     /**
      * decodes unicode
      *
      * @param s
      * @return
      */
-    public static String unicodeDecode(final String input) {
+    public static String unicodeDecode(final CharSequence input) {
         if (input == null) {
             return null;
         }
-        String s = input;
+        CharSequence s = input;
         if (true) {
             // convert any html based unicode as a pre correction
             final String regex = "(&#x([0-9a-f]{4});)";
             final String[] rmHtml = new Regex(s, regex).getColumn(0);
             if (rmHtml != null && rmHtml.length != 0) {
+                String pre = s.toString();
+                boolean replace = false;
                 // lets prevent wasteful cycles
                 final HashSet<String> dupe = new HashSet<String>();
                 for (final String htmlrm : rmHtml) {
                     if (dupe.add(htmlrm) == true) {
                         final String[] rm = new Regex(htmlrm, regex).getRow(0);
                         if (rm[1] != null) {
-                            s = s.replaceAll(rm[0], "\\\\u" + rm[1]);
+                            pre = pre.replaceAll(rm[0], "\\\\u" + rm[1]);
+                            replace = true;
                         }
                     }
+                }
+                if (replace) {
+                    s = pre;
                 }
             }
         }
