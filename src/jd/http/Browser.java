@@ -82,11 +82,14 @@ public class Browser {
                 final StringBuilder sb = new StringBuilder();
                 try {
                     sb.append(request.printHeaders());
-                    sb.append("\r\n");
                 } catch (Exception e) {
                     Exceptions.getStackTrace(sb, e);
                 }
-                sb.append(super.getMessage());
+                final String message = super.getMessage();
+                if (StringUtils.isNotEmpty(message)) {
+                    sb.append("\r\n");
+                    sb.append(message);
+                }
                 return sb.toString();
             } else {
                 return super.getMessage();
