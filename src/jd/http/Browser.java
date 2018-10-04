@@ -44,6 +44,7 @@ import jd.parser.html.Form;
 import jd.parser.html.InputField;
 
 import org.appwork.net.protocol.http.HTTPConstants;
+import org.appwork.utils.Exceptions;
 import org.appwork.utils.KeyValueStringEntry;
 import org.appwork.utils.StringUtils;
 import org.appwork.utils.logging2.ConsoleLogImpl;
@@ -72,6 +73,24 @@ public class Browser {
         public BrowserException(final String message, final Request request, final Exception e) {
             super(message, e);
             this.request = request;
+        }
+
+        @Override
+        public String getMessage() {
+            final Request request = this.getRequest();
+            if (request != null) {
+                final StringBuilder sb = new StringBuilder();
+                try {
+                    sb.append(request.printHeaders());
+                    sb.append("\r\n");
+                } catch (Exception e) {
+                    Exceptions.getStackTrace(sb, e);
+                }
+                sb.append(super.getMessage());
+                return sb.toString();
+            } else {
+                return super.getMessage();
+            }
         }
 
         public Request getRequest() {
