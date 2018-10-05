@@ -96,6 +96,10 @@ public class Browser {
             }
         }
 
+        public String getSuperMessage() {
+            return super.getMessage();
+        }
+
         public Request getRequest() {
             return this.request;
         }
