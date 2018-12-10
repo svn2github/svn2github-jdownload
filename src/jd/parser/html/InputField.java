@@ -129,7 +129,7 @@ public class InputField {
 
     /**
      * always URLEncode form values parsed from html
-     * 
+     *
      * @param str
      * @return
      */
@@ -176,7 +176,7 @@ public class InputField {
     }
 
     /**
-     * so you can rename inputfield without having to delete and re-add inputfield/put and loose properties etc.
+     * so you can rename inputfield without having to delete and re-add inputfield/put and lose properties etc.
      *
      * @since JD2
      * @author raztoki
